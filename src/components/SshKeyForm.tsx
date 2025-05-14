@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,50 +11,68 @@ const SshKeyForm = () => {
   const [sshKey, setSshKey] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Update this URL to your deployed backend on Render
+  const backendApiUrl = "https://ssh-backend-server.onrender.com/api/send-ssh-key/";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic validation
+
     if (!username.trim()) {
       toast.error("Username is required");
       return;
     }
-    
+
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Please enter a valid email address");
       return;
     }
-    
+
     if (!sshKey.trim() || !sshKey.startsWith("ssh-")) {
       toast.error("Please enter a valid SSH public key");
       return;
     }
-    
+
     setIsSubmitting(true);
-    
-    // Simulate API call
-    try {
-      // In a real app, this would be an API call to save the SSH key
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success("SSH key successfully added");
-      
-      // Reset the form
+
+    const formData = {
+      username,
+      email,
+      sshKey,
+    };
+
+    const response = await fetch(backendApiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      toast.success(result.message || "SSH Key submitted successfully and email process initiated!");
       setUsername("");
       setEmail("");
       setSshKey("");
-    } catch (error) {
-      toast.error("Failed to add SSH key. Please try again.");
-      console.error("Error submitting SSH key:", error);
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      let errorMessage = "Failed to submit SSH key.";
+      try {
+        const errorResult = await response.json();
+        errorMessage = errorResult.detail || errorResult.message || errorMessage;
+      } catch (parseError) {
+        // If parsing error response fails, use the generic message
+      }
+      toast.error(errorMessage);
+      console.error("Error submitting SSH key:", response.statusText, await response.text());
     }
+    setIsSubmitting(false);
   };
 
   return (
     <div className="w-full max-w-md mx-auto rounded-lg border border-gray-200 shadow-sm bg-white p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-900">Add SSH Key</h2>
-      
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900">
+        Add SSH Key
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="username" className="text-sm font-medium">
@@ -69,7 +86,7 @@ const SshKeyForm = () => {
             className="w-full"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="email" className="text-sm font-medium">
             Email
@@ -83,7 +100,7 @@ const SshKeyForm = () => {
             className="w-full"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="ssh-key" className="text-sm font-medium">
             Public SSH Key
@@ -96,16 +113,17 @@ const SshKeyForm = () => {
             className="font-mono text-sm h-32 resize-y"
           />
           <p className="text-xs text-gray-500">
-            Paste your public SSH key. It typically starts with 'ssh-rsa', 'ssh-ed25519', etc.
+            Paste your public SSH key. It typically starts with
+            "ssh-rsa", "ssh-ed25519", etc.
           </p>
         </div>
-        
-        <Button 
-          type="submit" 
+
+        <Button
+          type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Submitting..." : "Add SSH Key"}
+          {isSubmitting ? "Submitting..." : "Submit SSH Key"}
         </Button>
       </form>
     </div>
