@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,7 +53,7 @@ const SshKeyForm = () => {
 
   return (
     <div className="w-full max-w-md mx-auto rounded-lg border border-gray-200 shadow-sm bg-white p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-gray-900">Add SSH Key</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-gray-900">Submit SSH Key</h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
