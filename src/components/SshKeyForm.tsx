@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 const SshKeyForm = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   const [sshKey, setSshKey] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,6 +39,7 @@ const SshKeyForm = () => {
     const formData = {
       username,
       email,
+      jobDescription,
       sshKey,
     };
 
@@ -53,6 +56,7 @@ const SshKeyForm = () => {
       toast.success(result.message || "SSH Key submitted successfully and email process initiated!");
       setUsername("");
       setEmail("");
+      setJobDescription("");
       setSshKey("");
     } else {
       let errorMessage = "Failed to submit SSH key.";
@@ -98,6 +102,19 @@ const SshKeyForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="john@example.com"
             className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="job-description" className="text-sm font-medium">
+            Job Description
+          </Label>
+          <Textarea
+            id="job-description"
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            placeholder="Please describe your current role or position"
+            className="w-full resize-y h-24"
           />
         </div>
 
